@@ -3,8 +3,10 @@ package com.abdelysf.edulocity.service;
 
 import com.abdelysf.edulocity.dto.RegisterInstructorRequest;
 import com.abdelysf.edulocity.dto.RegisterStudentRequest;
+import com.abdelysf.edulocity.exceptions.EduLocityException;
 import com.abdelysf.edulocity.model.*;
 import com.abdelysf.edulocity.repository.IStudentDAO;
+import com.abdelysf.edulocity.repository.IUserDAO;
 import com.abdelysf.edulocity.repository.IVerificationTokenDAO;
 import com.abdelysf.edulocity.repository.InstructorDAO;
 import lombok.AllArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -23,6 +26,7 @@ public class AuthService {
     private final IStudentDAO studentRepository;
     private final InstructorDAO instructorRepository;
     private final IVerificationTokenDAO verificationTokenRepository;
+    private final IUserDAO userRepository;
     private final MailService mailService;
 
 
@@ -112,5 +116,25 @@ public class AuthService {
                 ));
     }
 
+    /**
+     * verify that a passed token is valid and enable the user associated to it
+     * @param token
+     */
+    public void verifyAccount(String token) {
+        Optional<VerificationToken> byToken = verificationTokenRepository.findByToken(token);
+        byToken.orElseThrow(()-> new EduLocityException("invalid token"));
+        fetchUserAndEnable(byToken.get());
+    }
 
+    /**
+     * enable the user
+     * @param verificationToken
+     */
+    @Transactional
+    public  void fetchUserAndEnable(VerificationToken verificationToken) {
+        String username = verificationToken.getUser().getUserName();
+        User user = userRepository.findByUserName(username).orElseThrow(() -> new EduLocityException("User not found with name - " + username));
+        user.setEnabled(true);
+        userRepository.save(user);
+    }
 }
