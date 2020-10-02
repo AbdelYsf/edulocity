@@ -1,0 +1,23 @@
+package com.abdelysf.edulocity.model;
+
+import lombok.*;
+
+import javax.persistence.*;
+import java.util.Collection;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
+@Getter
+@Setter
+@Entity
+public class Instructor  extends User {
+
+
+    private  Specialisation specialisation;
+    private  String bio;
+
+    @OneToMany(mappedBy = "instructor",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    private Collection<Course> courses;
+}
