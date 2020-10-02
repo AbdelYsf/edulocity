@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -22,9 +23,11 @@ public class AuthService {
     private final IStudentDAO studentRepository;
     private final InstructorDAO instructorRepository;
     private final IVerificationTokenDAO verificationTokenRepository;
+    private final MailService mailService;
 
 
 
+    @Transactional
     public void signUpStudent(RegisterStudentRequest studentRequest){
         //mapping the request DTO with an instance of student
         Student student = new Student();
@@ -41,11 +44,15 @@ public class AuthService {
         student.setEnabled(false);
         //saving the student
         studentRepository.save(student);
-
+        //get token
+        String token = generateVerificationToken(student);
+        //send verification email
+        sendMailToUser(student,token);
 
 
     }
 
+    @Transactional
     public void signUpInstructor(RegisterInstructorRequest instructorRequest){
         //mapping the request DTO with an instance of Instructor
         Instructor instructor = new Instructor();
@@ -60,8 +67,10 @@ public class AuthService {
         instructor.setSpecialisation(specialisation);
         //saving the instructor
         instructorRepository.save(instructor);
-
-
+        //get token
+        String token = generateVerificationToken(instructor);
+        //send verification email
+        sendMailToUser(instructor,token);
 
     }
 
@@ -84,4 +93,24 @@ public class AuthService {
 
         return token;
     }
+
+    /**
+     * send the verification email to the user
+     * @param user
+     * @param token
+     */
+
+    private void sendMailToUser(User user , String token ){
+
+         final String endpointUrl="http://localhost:8080/api/auth/accountVerification/"+token;
+         final String messageBody="on vous remercie pour l'inscription dans Edulocity " +
+                 ",veuillez completer votre inscription en cliquant sur le lien ci-dessous :\n";
+
+        mailService.sendMail(new NotificationEmail("activation de votre compte"
+                ,user.getEmail()
+                ,messageBody+endpointUrl
+                ));
+    }
+
+
 }
