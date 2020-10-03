@@ -1,6 +1,8 @@
 package com.abdelysf.edulocity.controller;
 
 
+import com.abdelysf.edulocity.dto.AuthenticationResponse;
+import com.abdelysf.edulocity.dto.LoginRequest;
 import com.abdelysf.edulocity.dto.RegisterInstructorRequest;
 import com.abdelysf.edulocity.dto.RegisterStudentRequest;
 import com.abdelysf.edulocity.service.AuthService;
@@ -32,6 +34,12 @@ public class AuthController {
     @GetMapping("accountVerification/{token}")
     public ResponseEntity<String>  verifyAccount(@PathVariable String token){
         authService.verifyAccount(token);
-        return new ResponseEntity<String>("le compte était activé avec succès  ",HttpStatus.OK);
+        return new ResponseEntity<String>("le compte a été activé avec succès  ",HttpStatus.OK);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthenticationResponse> login(@RequestBody LoginRequest loginRequest) {
+        AuthenticationResponse response = authService.login(loginRequest);
+        return  new ResponseEntity<AuthenticationResponse>(response,HttpStatus.OK);
     }
 }

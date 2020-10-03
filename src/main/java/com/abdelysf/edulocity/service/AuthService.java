@@ -1,6 +1,8 @@
 package com.abdelysf.edulocity.service;
 
 
+import com.abdelysf.edulocity.dto.AuthenticationResponse;
+import com.abdelysf.edulocity.dto.LoginRequest;
 import com.abdelysf.edulocity.dto.RegisterInstructorRequest;
 import com.abdelysf.edulocity.dto.RegisterStudentRequest;
 import com.abdelysf.edulocity.exceptions.EduLocityException;
@@ -9,7 +11,12 @@ import com.abdelysf.edulocity.repository.IStudentDAO;
 import com.abdelysf.edulocity.repository.IUserDAO;
 import com.abdelysf.edulocity.repository.IVerificationTokenDAO;
 import com.abdelysf.edulocity.repository.InstructorDAO;
+import com.abdelysf.edulocity.security.JwtProvider;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +35,8 @@ public class AuthService {
     private final IVerificationTokenDAO verificationTokenRepository;
     private final IUserDAO userRepository;
     private final MailService mailService;
+    private  final AuthenticationManager authenticationManager;
+    private  final JwtProvider jwtProvider;
 
 
 
@@ -136,5 +145,20 @@ public class AuthService {
         User user = userRepository.findByUserName(username).orElseThrow(() -> new EduLocityException("User not found with name - " + username));
         user.setEnabled(true);
         userRepository.save(user);
+    }
+
+    public AuthenticationResponse login(LoginRequest loginRequest) {
+
+        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUserName(),
+                loginRequest.getPassword()));
+        // storing the authentication object inside the security context
+
+        SecurityContextHolder.getContext().setAuthentication(authenticate); // further we can just look in the context to see whether the user is login or not
+        // generating the token
+        String token = jwtProvider.generateToken(authenticate);
+
+        return new AuthenticationResponse(token,loginRequest.getUserName());
+
+
     }
 }
