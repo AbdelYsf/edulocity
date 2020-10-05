@@ -1,6 +1,7 @@
 package com.abdelysf.edulocity.controller;
 
 import com.abdelysf.edulocity.dto.AddCourseDto;
+import com.abdelysf.edulocity.dto.AddPartRequest;
 import com.abdelysf.edulocity.dto.AddSectionRequest;
 import com.abdelysf.edulocity.dto.CourseResponseDto;
 import com.abdelysf.edulocity.mapper.CourseMapper;
@@ -62,6 +63,14 @@ public class CourseController {
         courseService.addSectionToCourse(addSectionRequest);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+    @PostMapping("/section/parts/create")
+    public ResponseEntity createPartSection(@ModelAttribute AddPartRequest AddPartRequest){
+
+        courseService.addPartToSection(AddPartRequest);
+
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
 
 
 
