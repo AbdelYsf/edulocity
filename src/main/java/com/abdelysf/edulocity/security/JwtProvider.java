@@ -3,6 +3,7 @@ package com.abdelysf.edulocity.security;
 import com.abdelysf.edulocity.exceptions.EduLocityException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,6 @@ import java.io.InputStream;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.time.Instant;
-import java.util.Date;
 
 import static io.jsonwebtoken.Jwts.parser;
 import static java.util.Date.from;
@@ -22,11 +22,14 @@ import static java.util.Date.from;
 @Service
 public class JwtProvider {
 
+
+
     private static final String KEYSTOR_FILE_NAME="edulocity";
     private static final String KEYSTOR_FILE_NAME_WITH_EXTENSION="/edulocity.jks";
     private static final String KEYSTOR_FILE_SECRET="abdellah";
 
-
+    @Value("${jwt.expiration.time}")
+    private Long jwtExpirationInMillis;
 
     //storage facility for cryptographic keys and certificates
     private KeyStore keyStore;
@@ -59,15 +62,19 @@ public class JwtProvider {
                 .compact();
     }
 
-//    public String generateTokenWithUserName(String username) {
-//        return Jwts.builder()
-//                .setSubject(username)
-//                .setIssuedAt(from(Instant.now()))
-//                .signWith(getPrivateKey())
-//                .setExpiration(from(Instant.now().plusMillis(jwtExpirationInMillis)))
-//                .compact();
-//    }
+    public String generateTokenWithUserName(String username) {
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(from(Instant.now()))
+                .signWith(getPrivateKey())
+                .setExpiration(from(Instant.now().plusMillis(jwtExpirationInMillis)))
+                .compact();
+    }
 
+    /**
+     * ret the private key from the keystore
+     * @return
+     */
     private PrivateKey getPrivateKey() {
         try {
             //getting the private key
@@ -85,6 +92,10 @@ public class JwtProvider {
         return true;
     }
 
+    /**
+     * get the public key from the keystore
+     * @return
+     */
     private PublicKey getPublicKey() {
         try {
             // getting the public key
@@ -95,7 +106,12 @@ public class JwtProvider {
         }
     }
 
-    public String getUsernameFromJwt(String token) {
+    /**
+     * get the subject (username) from the jwt
+     * @param token
+     * @return
+     */
+    public String getUsernameFromJWT(String token) {
         Claims claims = parser()
                 .setSigningKey(getPublicKey())
                 .parseClaimsJws(token)
@@ -104,7 +120,7 @@ public class JwtProvider {
         return claims.getSubject();
     }
 
-//    public Long getJwtExpirationInMillis() {
-//        return jwtExpirationInMillis;
-//    }
+    public Long getJwtExpirationInMillis() {
+        return jwtExpirationInMillis;
+    }
 }

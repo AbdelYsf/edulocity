@@ -10,14 +10,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ICourseDAO extends JpaRepository<Course,Integer> {
 
 
+
     List<Course> findCourseByInstructor(Instructor instructor);
     List<Course> findCourseByStudents(Student s);
-    List<Course> findCourseById(int id);
+    Optional<Course> findCourseById(int id);
     List<Course> findCourseByCategory(Category category);
+    List<Course> findAll();
 
     @Query(value = "SELECT c FROM Course c ")
     Page<Course> findCourse(PageRequest pageRequest);

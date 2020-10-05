@@ -19,18 +19,18 @@ public class Course implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Integer id;
-    public String title;
-    public String description;
-    public String prerequisites;
-    public String level;
-    public String estimatedTime;
-    public  boolean isApproved;
-    public String imagePath;
-    public String Price;
+    private Integer id;
+    private String title;
+    private String description;
+    private String prerequisites;
+    private  String level;
+    private String estimatedTime;
+    private  boolean isApproved;
+    private String imagePath;
+    private String Price;
    @ManyToOne
     @JoinColumn(name="categoy_id")
-    public Category category;
+    private Category category;
 
    @ManyToOne
    @JoinColumn(name = "inctructor_id")
