@@ -2,12 +2,9 @@ package com.abdelysf.edulocity.service;
 
 import com.abdelysf.edulocity.dto.AddPartRequest;
 import com.abdelysf.edulocity.dto.AddSectionRequest;
-import com.abdelysf.edulocity.dto.CourseResponseDto;
 import com.abdelysf.edulocity.exceptions.CourseNotFoundException;
-import com.abdelysf.edulocity.exceptions.EduLocityException;
 import com.abdelysf.edulocity.exceptions.SectionNotFoundException;
 import com.abdelysf.edulocity.exceptions.UserNotFoundException;
-import com.abdelysf.edulocity.mapper.CourseMapper;
 import com.abdelysf.edulocity.model.*;
 import com.abdelysf.edulocity.repository.ICourseDAO;
 import com.abdelysf.edulocity.repository.IPartDAO;
@@ -27,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
+
 
 
 @Slf4j

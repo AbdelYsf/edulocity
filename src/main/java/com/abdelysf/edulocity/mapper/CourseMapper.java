@@ -3,11 +3,9 @@ package com.abdelysf.edulocity.mapper;
 
 import com.abdelysf.edulocity.dto.AddCourseDto;
 import com.abdelysf.edulocity.dto.CourseResponseDto;
+import com.abdelysf.edulocity.dto.PartDto;
 import com.abdelysf.edulocity.dto.SectionResponseDto;
-import com.abdelysf.edulocity.model.Category;
-import com.abdelysf.edulocity.model.Course;
-import com.abdelysf.edulocity.model.Instructor;
-import com.abdelysf.edulocity.model.Section;
+import com.abdelysf.edulocity.model.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -41,15 +39,30 @@ public interface CourseMapper {
     default String mapCategoryName(Category Category){
         return Category.getCategoryName();
     }
+
     default List<SectionResponseDto> mapSections(Collection<Section> sections){
         List<SectionResponseDto>  list = new ArrayList<>();
-        SectionResponseDto dto=null;
+        SectionResponseDto sectionDto=null;
         for (Section s : sections) {
-            dto = new SectionResponseDto();
-            dto.setSectionId((s.getId()));
-            dto.setSectionName(s.getSectionName());
-            dto.setDescription(s.getDescription());
-            list.add(dto);
+            sectionDto = new SectionResponseDto();
+            sectionDto.setSectionId((s.getId()));
+            sectionDto.setSectionName(s.getSectionName());
+            sectionDto.setDescription(s.getDescription());
+            // add parts
+            PartDto partDto=null;
+            for (Part part:s.getPart()) {
+                partDto = new PartDto();
+                partDto.setId(part.getId());
+                partDto.setPartName(part.getPartName());
+                partDto.setDescription(part.getDescription());
+                partDto.setFileType(part.getFileType());
+                partDto.setFilePath(part.getPath());
+                if (sectionDto.getParts()==null){
+                    sectionDto.setParts(new ArrayList());
+                }
+                sectionDto.getParts().add(partDto);
+            }
+            list.add(sectionDto);
         }
        return list;
     }
