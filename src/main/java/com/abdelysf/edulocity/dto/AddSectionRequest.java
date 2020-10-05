@@ -8,8 +8,8 @@ import lombok.*;
 @ToString
 @Getter
 @Setter
-public class SectionResponseDto {
-    private Long sectionId;
-    private  String sectionName;
+public class AddSectionRequest {
+    private int courseId;
+    private String sectionName;
     private String description;
 }

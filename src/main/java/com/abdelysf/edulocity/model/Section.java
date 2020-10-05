@@ -16,15 +16,15 @@ import java.util.Collection;
 public class Section  implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Long id;
-    public String sectionName;
-    public String description;
+    private Long id;
+    private String sectionName;
+    private String description;
 
     @ManyToOne
     @JoinColumn(name = "course_id")
-    public Course course;
+    private Course course;
 
     @OneToMany(mappedBy = "section")
-    public Collection<Part> part;
+    private Collection<Part> part;
 
 }

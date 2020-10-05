@@ -3,6 +3,7 @@ package com.abdelysf.edulocity.mapper;
 
 import com.abdelysf.edulocity.dto.AddCourseDto;
 import com.abdelysf.edulocity.dto.CourseResponseDto;
+import com.abdelysf.edulocity.dto.SectionResponseDto;
 import com.abdelysf.edulocity.model.Category;
 import com.abdelysf.edulocity.model.Course;
 import com.abdelysf.edulocity.model.Instructor;
@@ -10,7 +11,9 @@ import com.abdelysf.edulocity.model.Section;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+import org.springframework.jmx.export.annotation.ManagedOperationParameter;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,14 +23,15 @@ public interface CourseMapper {
     CourseMapper INSTANCE = Mappers.getMapper(CourseMapper.class);
     Course mapDtoToCourse(AddCourseDto addCourseDto);
 
-    @Mapping(target ="sectionCount" ,expression = "java(mapSections(course.getSections()))")
+    @Mapping(target ="sectionCount" ,expression = "java(mapSectionsCount(course.getSections()))")
     @Mapping(target ="instructorName",expression = "java(mapInstructorName(course.getInstructor()))")
     @Mapping(target ="category",expression = "java(mapCategoryName(course.getCategory()))")
     @Mapping(target = "courseId", source = "id")
+    @Mapping(target ="sections" , expression = "java(mapSections(course.getSections()))")
     CourseResponseDto mapCourseToResponseDto(Course course);
 
 
-    default String mapSections(Collection<Section> sections){
+    default String mapSectionsCount(Collection<Section> sections){
         return String.valueOf( sections.size());
     }
     default String mapInstructorName(Instructor instructor){
@@ -36,5 +40,17 @@ public interface CourseMapper {
 
     default String mapCategoryName(Category Category){
         return Category.getCategoryName();
+    }
+    default List<SectionResponseDto> mapSections(Collection<Section> sections){
+        List<SectionResponseDto>  list = new ArrayList<>();
+        SectionResponseDto dto=null;
+        for (Section s : sections) {
+            dto = new SectionResponseDto();
+            dto.setSectionId((s.getId()));
+            dto.setSectionName(s.getSectionName());
+            dto.setDescription(s.getDescription());
+            list.add(dto);
+        }
+       return list;
     }
 }

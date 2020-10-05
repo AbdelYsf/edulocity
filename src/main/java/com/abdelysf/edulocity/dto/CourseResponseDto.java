@@ -25,5 +25,7 @@ public class CourseResponseDto {
     private String category;
     private String instructorName;
     private String sectionCount;
+    private List<SectionResponseDto> sections;
+
 
 }

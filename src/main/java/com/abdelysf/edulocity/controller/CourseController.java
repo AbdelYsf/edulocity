@@ -1,19 +1,17 @@
 package com.abdelysf.edulocity.controller;
 
 import com.abdelysf.edulocity.dto.AddCourseDto;
+import com.abdelysf.edulocity.dto.AddSectionRequest;
 import com.abdelysf.edulocity.dto.CourseResponseDto;
 import com.abdelysf.edulocity.mapper.CourseMapper;
 import com.abdelysf.edulocity.model.Course;
 import com.abdelysf.edulocity.service.CourseService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,7 +44,6 @@ public class CourseController {
     @GetMapping("/{id}")
     public ResponseEntity<CourseResponseDto> createCourse(@PathVariable int id){
         CourseResponseDto courseResponseDto = courseMapper.mapCourseToResponseDto(courseService.getCourse(id));
-
         return new ResponseEntity<CourseResponseDto>(courseResponseDto,HttpStatus.OK);
     }
     @GetMapping
@@ -58,6 +55,17 @@ public class CourseController {
                                         .collect(Collectors.toList());
         return new ResponseEntity<>(courseResponseDtoList,HttpStatus.OK);
     }
+
+    @PostMapping("/section/create")
+    public ResponseEntity createSectionCourse(@RequestBody AddSectionRequest addSectionRequest){
+
+        courseService.addSectionToCourse(addSectionRequest);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+
+
+
 
 
 }
