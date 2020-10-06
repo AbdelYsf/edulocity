@@ -1,2 +1,2 @@
 # EduLocity (education + velocity )
-backend code of a learning management system which i named EduLocity
+backend code of a learning management system which I named EduLocity
