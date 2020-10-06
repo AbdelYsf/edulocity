@@ -20,7 +20,7 @@ public interface CourseMapper {
 
     CourseMapper INSTANCE = Mappers.getMapper(CourseMapper.class);
     Course mapDtoToCourse(AddCourseDto addCourseDto);
-
+     // if we need to inject a field , we can change the interface to abstract class
     @Mapping(target ="sectionCount" ,expression = "java(mapSectionsCount(course.getSections()))")
     @Mapping(target ="instructorName",expression = "java(mapInstructorName(course.getInstructor()))")
     @Mapping(target ="category",expression = "java(mapCategoryName(course.getCategory()))")
@@ -30,6 +30,7 @@ public interface CourseMapper {
 
 
     default String mapSectionsCount(Collection<Section> sections){
+
         return String.valueOf( sections.size());
     }
     default String mapInstructorName(Instructor instructor){

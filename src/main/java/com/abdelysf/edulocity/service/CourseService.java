@@ -112,7 +112,6 @@ public class CourseService {
 
 
     }
-
     @Transactional
     public void addPartToSection(AddPartRequest addPartRequest) {
         Section section = sectionRepository

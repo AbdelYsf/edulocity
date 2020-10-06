@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.time.Instant;
+import java.util.Date;
 
 import static io.jsonwebtoken.Jwts.parser;
 import static java.util.Date.from;
@@ -59,6 +60,7 @@ public class JwtProvider {
         return Jwts.builder()
                 .setSubject(principal.getUsername())
                 .signWith(getPrivateKey())
+                .setExpiration(Date.from(Instant.now().plusMillis(jwtExpirationInMillis)))
                 .compact();
     }
 

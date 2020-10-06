@@ -1,11 +1,9 @@
 package com.abdelysf.edulocity.service;
 
 
-import com.abdelysf.edulocity.dto.AuthenticationResponse;
-import com.abdelysf.edulocity.dto.LoginRequest;
-import com.abdelysf.edulocity.dto.RegisterInstructorRequest;
-import com.abdelysf.edulocity.dto.RegisterStudentRequest;
+import com.abdelysf.edulocity.dto.*;
 import com.abdelysf.edulocity.exceptions.EduLocityException;
+import com.abdelysf.edulocity.exceptions.UserNotFoundException;
 import com.abdelysf.edulocity.model.*;
 import com.abdelysf.edulocity.repository.IStudentDAO;
 import com.abdelysf.edulocity.repository.IUserDAO;
@@ -13,6 +11,7 @@ import com.abdelysf.edulocity.repository.IVerificationTokenDAO;
 import com.abdelysf.edulocity.repository.InstructorDAO;
 import com.abdelysf.edulocity.security.JwtProvider;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -37,6 +36,7 @@ public class AuthService {
     private final MailService mailService;
     private  final AuthenticationManager authenticationManager;
     private  final JwtProvider jwtProvider;
+    private  final RefreshTokenService refreshTokenService;
 
 
 
@@ -156,9 +156,47 @@ public class AuthService {
         SecurityContextHolder.getContext().setAuthentication(authenticate); // further we can just look in the context to see whether the user is login or not
         // generating the token
         String token = jwtProvider.generateToken(authenticate);
+        // getting the role
+        String userRoleName = getUserRoleName(loginRequest.getUserName());
+        return AuthenticationResponse.builder()
+                .authenticationToken(token)
+                .username(loginRequest.getUserName())
+                .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
+                .refreshToken(refreshTokenService.generateRefreshToken().getToken())
+                .role(userRoleName)
+                .build();
 
-        return new AuthenticationResponse(token,loginRequest.getUserName());
 
+    }
 
+    public AuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
+        refreshTokenService.validateRefreshToken(refreshTokenRequest.getRefreshToken());
+        String token = jwtProvider.generateTokenWithUserName(refreshTokenRequest.getUsername());
+        return AuthenticationResponse.builder()
+                .authenticationToken(token)
+                .refreshToken(refreshTokenRequest.getRefreshToken())
+                .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
+                .username(refreshTokenRequest.getUsername())
+                .role(getUserRoleName(refreshTokenRequest.getUsername()))
+                .build();
+    }
+
+    public boolean isLoggedIn() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
+    }
+    private String getUserRoleName(String userName){
+
+        User user = userRepository.findByUserName(userName)
+                .orElseThrow(() -> new UserNotFoundException("cannot find user :" + userName));
+        String role ;
+        if(user instanceof Instructor){
+            role="instructor";
+        }else if (user instanceof Student){
+            role="student";
+        }else {
+            role="admin";
+        }
+        return role;
     }
 }
