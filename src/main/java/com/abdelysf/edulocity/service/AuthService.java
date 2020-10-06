@@ -18,8 +18,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
+
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -124,15 +125,13 @@ public class AuthService {
                 ,messageBody+endpointUrl
                 ));
     }
-
     /**
      * verify that a passed token is valid and enable the user associated to it
      * @param token
      */
     public void verifyAccount(String token) {
-        Optional<VerificationToken> byToken = verificationTokenRepository.findByToken(token);
-        byToken.orElseThrow(()-> new EduLocityException("invalid token"));
-        fetchUserAndEnable(byToken.get());
+        VerificationToken invalid_token = verificationTokenRepository.findByToken(token).orElseThrow(() -> new EduLocityException("invalid token"));
+        fetchUserAndEnable(invalid_token);
     }
 
     /**
