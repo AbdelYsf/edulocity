@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/courses")
 @AllArgsConstructor
 @Slf4j
+//@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class CourseController {
 
 
@@ -54,6 +55,7 @@ public class CourseController {
                                         .stream()
                                         .map(courseMapper::mapCourseToResponseDto)
                                         .collect(Collectors.toList());
+        System.out.println("heeeere");
         return new ResponseEntity<>(courseResponseDtoList,HttpStatus.OK);
     }
 
